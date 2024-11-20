@@ -1,0 +1,10 @@
+{
+    "grc-eng": {
+        "input": "grc-eng-input.txt",
+        "mode": "grc-eng"
+    },
+    "eng-grc": {
+        "input": "eng-grc-input.txt",
+        "mode": "eng-grc"
+    }
+}
