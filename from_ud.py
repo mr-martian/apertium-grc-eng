@@ -3,6 +3,8 @@
 import re
 import sys
 
+include_gloss = ('-g' in sys.argv)
+
 TAGS = {}
 def add_tag(name, vals):
     TAGS[name] = (re.compile(f'{name}=(\\w+)'), vals)
@@ -30,8 +32,8 @@ BYPOS = {
                       'VerbForm', 'Gender', 'Person', 'Number', 'Case']),
     'DET': ('det', ['PronType', 'Person', 'Gender', 'Number', 'Case']),
     'PRON': ('prn', ['PronType', 'Person', 'Gender', 'Number', 'Case']),
-    'CCONJ': ('conjcoo', []),
-    'SCONJ': ('conjsub', []),
+    'CCONJ': ('cnjcoo', []),
+    'SCONJ': ('cnjsub', []),
     'ADP': ('pr', []),
     'ADV': ('adv', ['PronType']),
     'NUM': ('num', ['NumType', 'Gender', 'Case']),
@@ -61,6 +63,11 @@ for line in sys.stdin:
     head = cols[6]
     rel = cols[7]
     spaceafter = ('' if 'SpaceAfter=No' in cols[9] else ' ')
+    if include_gloss:
+        gloss = '/' + ''.join(x[6:] for x in cols[9].split('|')
+                              if x.startswith('Gloss='))
+    else:
+        gloss = ''
     tags = []
     apos, cats = BYPOS[upos]
     if upos == 'PUNCT' and lem == ',':
@@ -71,5 +78,5 @@ for line in sys.stdin:
         if m := pat.search(feats):
             tags.append(vals[m.group(1)])
     ts = ''.join(f'<{t}>' for t in tags if t)
-    sys.stdout.write(f'^{lem}{ts}<@{rel}><#{idx}→{head}>${spaceafter}')
+    sys.stdout.write(f'^{lem}{ts}<@{rel}><#{idx}→{head}>{gloss}${spaceafter}')
 sys.stdout.flush()
